@@ -1,6 +1,6 @@
 import React, { useActionState, useState } from 'react'
 import { FiMessageSquare } from "react-icons/fi";
-  import { LuUser } from "react-icons/lu";
+import { LuUser } from "react-icons/lu";
 import { GoLock } from "react-icons/go";
 import { FaRegEnvelope, FaRegEyeSlash } from "react-icons/fa6";
 import { IoEyeOutline } from "react-icons/io5";
