@@ -8,6 +8,7 @@ import { BiLoaderCircle } from "react-icons/bi";
 import { Link } from 'react-router-dom';
 import AuthImagePattern from '../components/AuthImagePattern';
 import toast from 'react-hot-toast';
+import { useDispatch } from "react-redux"
 
 function Signup() {
   const[showPassword, setShowPassword] = useState();
@@ -15,7 +16,7 @@ function Signup() {
     const userName = formData.get("userName");
     const email = formData.get("email");
     const password = formData.get("password");
-  
+    const dispatch = useDispatch();
     // Field Validations
     if(!userName.trim()){
       toast.error("Username is reuired");
@@ -39,7 +40,7 @@ function Signup() {
     // Api calling
     const payload = { userName, email, password};
     if(payload.userName.length && payload.email.length && payload.password.length){
-
+      dispatch(payload);
     }
   })
 

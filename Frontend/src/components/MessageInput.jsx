@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { LuImage, LuSend } from "react-icons/lu";
 
 function MessageInput() {
-//   const [text, setText] = useState("");
+  const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
 
