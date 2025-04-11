@@ -5,6 +5,6 @@ import { getConversations, getMessages, sendMsg } from "../controllers/message.c
 const messageRouter = Router()
 messageRouter.route('/conversations').get(verifyJwt, getConversations);
 messageRouter.route('/:otherUserId').get(verifyJwt, getMessages);
-messageRouter.route('/').post(verifyJwt, sendMsg)
+messageRouter.route('/send').post(verifyJwt, sendMsg)
 
 export default messageRouter;

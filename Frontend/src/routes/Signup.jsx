@@ -5,18 +5,22 @@ import { GoLock } from "react-icons/go";
 import { FaRegEnvelope, FaRegEyeSlash } from "react-icons/fa6";
 import { IoEyeOutline } from "react-icons/io5";
 import { BiLoaderCircle } from "react-icons/bi";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import AuthImagePattern from '../components/AuthImagePattern';
 import toast from 'react-hot-toast';
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
+import { signupUser } from '../redux/slices/authSlice';
 
 function Signup() {
   const[showPassword, setShowPassword] = useState();
+  const dispatch = useDispatch();
+  const navigte = useNavigate();
+  const isLoading = useSelector(state => state?.auth?.isLoading);
   const[user, submitAction, isPending] = useActionState(async (previousState, formData) => {
     const userName = formData.get("userName");
     const email = formData.get("email");
     const password = formData.get("password");
-    const dispatch = useDispatch();
+
     // Field Validations
     if(!userName.trim()){
       toast.error("Username is reuired");
@@ -40,7 +44,10 @@ function Signup() {
     // Api calling
     const payload = { userName, email, password};
     if(payload.userName.length && payload.email.length && payload.password.length){
-      dispatch(payload);
+      const resultAction = await dispatch(signupUser(payload));
+      if(signupUser.fulfilled.match(resultAction)){
+        navigte('/');
+      }
     }
   })
 
@@ -119,7 +126,7 @@ function Signup() {
               </div>
             </div>
             <button type="submit" className="btn btn-primary w-full" disabled={isPending}>
-              {isPending ? (
+              {isLoading ? (
                 <>
                   <BiLoaderCircle className="size-7 animate-spin" />
                   Loading...

@@ -4,16 +4,21 @@ import { GoLock } from "react-icons/go";
 import { FaRegEnvelope, FaRegEyeSlash } from "react-icons/fa6";
 import { IoEyeOutline } from "react-icons/io5";
 import { BiLoaderCircle } from "react-icons/bi";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import AuthImagePattern from '../components/AuthImagePattern';
 import toast from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux';
+import { signinUser } from '../redux/slices/authSlice';
 
 function Login() {
   const[showPassword, setShowPassword] = useState();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const isLoading = useSelector(state => state?.auth?.isLoading);
   const[user, submitAction, isPending] = useActionState(async (previousState, formData) => {
     const email = formData.get("email");
     const password = formData.get("password");
-  
+
     // Field Validations       
     if (!email) {
         toast.error("Email is required");
@@ -33,7 +38,10 @@ function Login() {
     // Api calling
     const payload = { email, password};
     if(payload.email.length && payload.password.length){
-
+      const resultAction = await dispatch(signinUser(payload));
+      if(signinUser?.fulfilled?.match(resultAction)){
+        navigate('/');
+      }
     }
   })
 
@@ -96,7 +104,7 @@ function Login() {
               </div>
             </div>
             <button type="submit" className="btn btn-primary w-full" disabled={isPending}>
-              {isPending ? (
+              {isLoading ? (
                 <>
                   <BiLoaderCircle className="size-7 animate-spin" />
                   Loading...
