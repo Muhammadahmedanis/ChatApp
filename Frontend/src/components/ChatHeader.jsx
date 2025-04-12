@@ -1,8 +1,9 @@
 import React from 'react'
 import { IoClose } from "react-icons/io5";
 
-function ChatHeader() {
-    let setSelectedUser;
+function ChatHeader({ data }) {
+
+  let setSelectedUser;
   return (
     <div className="p-2.5 border-b border-base-300">
       <div className="flex items-center justify-between">
@@ -10,13 +11,13 @@ function ChatHeader() {
           {/* Avatar */}
           <div className="avatar">
             <div className="size-10 rounded-full relative">
-              <img src={"selectedUser?.profilePic" || "/avatar.png"} alt={"selectedUser?.fullName"} />
+              <img src={data?.profilePic || "/avatar.png"} alt={data?.userName} />
             </div>
           </div>
 
           {/* User info */}
           <div>
-            <h3 className="font-medium">{"selectedUser?.fullName"}</h3>
+            <h3 className="font-medium">{data?.userName}</h3>
             {/* <p className="text-sm text-base-content/70">
               {onlineUsers?.includes(selectedUser?._id) ? "Online" : "Offline"}
             </p> */}

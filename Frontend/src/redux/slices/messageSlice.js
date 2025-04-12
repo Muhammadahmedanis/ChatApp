@@ -3,9 +3,15 @@ import { axiosInstance } from "../../api/axios";
 import toast from "react-hot-toast";
 
 
-export const sendMsg = createAsyncThunk("msg/send", async (userData, { rejectWithValue }) => {
+export const sendMsg = createAsyncThunk("msg/send", async (formData, { rejectWithValue }) => {
     try {
-        const response = await axiosInstance.post("msg/send", userData);
+        const response = await axiosInstance.post("msg/send", formData
+        // , {
+        //     headers:{
+        //         'Content-Type': 'multipart/form-data',
+        //     },
+        // }
+    );
         return response.data;
     } catch (error) {
         toast.error(error.response?.data?.message);
@@ -15,9 +21,9 @@ export const sendMsg = createAsyncThunk("msg/send", async (userData, { rejectWit
 
 
 
-export const getConversation = createAsyncThunk("msg/conversations", async (userData, { rejectWithValue }) => {
+export const getConversation = createAsyncThunk("msg/conversations", async (_, { rejectWithValue }) => {
     try {
-        const response = await axiosInstance.post("msg/conversations", userData);
+        const response = await axiosInstance.get("msg/conversations");
         return response.data;
     } catch (error) {
         toast.error(error.response?.data?.message);
@@ -31,7 +37,7 @@ export const getConversation = createAsyncThunk("msg/conversations", async (user
 
 export const otherConversation = createAsyncThunk( "msg/otherUserId", async (otherUserId, { rejectWithValue }) => {
     try {
-    const response = await axiosInstance.get(`msg/conversations/${otherUserId}`);
+    const response = await axiosInstance.get(`msg/${otherUserId}`);
     return response.data;
     } catch (error) {
     toast.error(error.response?.data?.message || "Failed to get conversation");
@@ -49,7 +55,8 @@ const messageSlice = createSlice({
         selectedConversation: null,
         isLoading: false,
         error: null,
-        messageStatus: null
+        messageStatus: null,
+        selectedUser: [],
     },
     reducers: {
         clearSelectedConversation: (state) => {
@@ -57,7 +64,10 @@ const messageSlice = createSlice({
         },
         clearMessageStatus: (state) => {
             state.messageStatus = null;
-        }
+        },
+        setSelectedUser: (state, action) => {
+            state.selectedUser = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -69,6 +79,11 @@ const messageSlice = createSlice({
             .addCase(sendMsg.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.messageStatus = "Message sent successfully";
+                if (state.selectedConversation) {
+                    state.selectedConversation.push(action.payload?.data);
+                } else {
+                    state.selectedConversation = [action.payload?.data];
+                }
             })
             .addCase(sendMsg.rejected, (state, action) => {
                 state.isLoading = false;
@@ -105,5 +120,5 @@ const messageSlice = createSlice({
 
 
 // Export actions & reducer
-export const { clearSelectedConversation, clearMessageStatus } = messageSlice.actions;
+export const { clearSelectedConversation, clearMessageStatus, setSelectedUser } = messageSlice.actions;
 export default messageSlice.reducer;

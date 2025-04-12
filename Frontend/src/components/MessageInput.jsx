@@ -2,12 +2,17 @@ import React, { useRef, useState } from 'react'
 import { useActionState } from 'react';
 import toast from 'react-hot-toast';
 import { LuImage, LuSend } from "react-icons/lu";
+import { useDispatch, useSelector } from 'react-redux';
+import { IoMdClose } from "react-icons/io";
+import { sendMsg } from '../redux/slices/messageSlice';
 
 function MessageInput() {
-  const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
-
+  const dispatch = useDispatch();
+  const { selectedUser } = useSelector(state => state?.message)
+  // console.log(selectedUser);  
+  
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file.type.startsWith("image/")) {
@@ -29,6 +34,14 @@ function MessageInput() {
   const[data, submitAction, isPending] = useActionState(async (previouState, formData) => {
     const message = formData.get("message");
     if(!message.trim()) return;
+    const payload = {
+      text: message,
+      recipientId: selectedUser?.userId,
+      // img: imagePreview,
+    }
+    // console.log(payload);
+    dispatch(sendMsg(payload));
+    // removeImage();
   })
 
   return (
@@ -47,7 +60,7 @@ function MessageInput() {
               flex items-center justify-center"
               type="button"
             >
-              <X className="size-3" />
+              <IoMdClose className="size-3 cursor-pointer" />
             </button>
           </div>
         </div>
@@ -81,7 +94,8 @@ function MessageInput() {
         <button
           type="submit"
           className="btn btn-sm btn-circle"
-          disabled={!text.trim() && !imagePreview}>
+          // disabled={!text.trim() || !imagePreview}
+          >
           <LuSend size={22} />
         </button>
       </form>
