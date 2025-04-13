@@ -7,6 +7,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import {v2 as cloudinary} from "cloudinary"
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { responseMessages } from "../constant/responseMessages.js";
+import { Conversation } from "../models/conversation.model.js";
 const { MISSING_FIELDS, USER_EXISTS, UN_AUTHORIZED, SUCCESS_REGISTRATION, NO_USER, SUCCESS_LOGIN, INVALID_OTP, OTP_EXPIRED, EMAIL_VERIFY, SUCCESS_LOGOUT, MISSING_FIELD_EMAIL_PASSWORD, UNAUTHORIZED_REQUEST, GET_SUCCESS_MESSAGES, RESET_LINK_SUCCESS, PASSWORD_CHANGE, NOT_VERIFY, PASSWORD_AND_CONFIRM_NO_MATCH, UPDATE_UNSUCCESS_MESSAGES, MISSING_FIELD_EMAIL, RESET_OTP_SECCESS, INVALID_TOKEN, TOKEN_EXPIRED, SUCCESS_TOKEN, INVALID_DATA, NO_DATA_FOUND, IMAGE_SUCCESS, IMAGE_ERROR , UPDATE_SUCCESS_MESSAGES, UNAUTHORIZED, NOT_ALLOWED} = responseMessages
 // import { sendEmailLink, sendEmailOTP } from '../utils/sendEmail.js';
 // import { v4 as uuidv4 } from 'uuid'
@@ -213,7 +214,7 @@ export const updateProfile = asyncHandler(async (req, res) => {
 export const myInfo = asyncHandler(async (req, res) => {
     const user = req?.user;
     if (!user) {
-        throw new ApiError(StatusCodes.NOT_FOUND, NO_USER);
+        throw new ApiError(StatusCodes.UNAUTHORIZED, UNAUTHORIZED_REQUEST);
     };
     
     const isUser = await User.findOne({_id: user?._id}).select('-refreshToken -password').lean();
@@ -222,4 +223,48 @@ export const myInfo = asyncHandler(async (req, res) => {
     }
 
     return res.status(StatusCodes.OK).send(new ApiResponse(StatusCodes.OK, '', isUser));
+})
+
+
+
+export const search =  asyncHandler(async (req, res) => {
+    const user = req?.user;
+    if (!user) {
+        throw new ApiError(StatusCodes.UNAUTHORIZED, UNAUTHORIZED_REQUEST);
+    };
+    
+    const query = req?.query?.query;
+    if(!query) return res.status(StatusCodes.BAD_REQUEST).send(new ApiResponse(StatusCodes.BAD_REQUEST, '', []));
+
+    const users = await User.find({
+        userName: { $regex: query, $options: 'i'},
+        _id: { $ne: user?._id }, //not include login user
+    }).select("userName profilePic");
+    if(!user){
+        throw new ApiError(StatusCodes.BAD_REQUEST, NO_DATA_FOUND)
+    };
+
+    const result = await Promise.all(
+        users.map( async(u) => {
+            const convo = await Conversation.findOne({
+                participants: {$all: [user?._id, u?._id]},
+            });
+            let lastMessage = null;
+            if(convo?.lastMessage){
+                lastMessage = {
+                    text: convo.lastMessage.text,
+                    sender: convo?.lastMessage?.sender,
+                };
+            }
+
+            return {
+                _id: u._id,
+                userName: u?.userName,
+                profilePic: u?.profilePic,
+                lastMessage,
+            }
+        })
+    );
+
+    return res.status(StatusCodes.OK).send(new ApiResponse(StatusCodes.OK, '', result));
 })

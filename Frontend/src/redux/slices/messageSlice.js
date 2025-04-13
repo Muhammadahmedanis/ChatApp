@@ -37,11 +37,11 @@ export const getConversation = createAsyncThunk("msg/conversations", async (_, {
 
 export const otherConversation = createAsyncThunk( "msg/otherUserId", async (otherUserId, { rejectWithValue }) => {
     try {
-    const response = await axiosInstance.get(`msg/${otherUserId}`);
-    return response.data;
+        const response = await axiosInstance.get(`msg/${otherUserId}`);
+        return response.data;
     } catch (error) {
-    toast.error(error.response?.data?.message || "Failed to get conversation");
-    return rejectWithValue(error.response?.data?.message);
+        toast.error(error.response?.data?.message || "Failed to get conversation");
+        return rejectWithValue(error.response?.data?.message);
     }
 });
   

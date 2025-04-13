@@ -19,21 +19,23 @@ function ChatContainer() {
 if (!selectedUser) return null;
   
   if(selectedConversation) return(
-    <div className='flex flex-1 flex-col overflow-auto'>
+    <div className='flex w-full justify-between flex-col overflow-auto'>
+      {/* <div className='flex flex-col justify-between'> */}
+
       <ChatHeader data={selectedUser} />
       { !selectedConversation ? 
         <MessageSkelton /> :
         selectedConversation.map((msg) => (
           <div
-            key={msg._id}
-            className={`my-2 mx-3 chat ${msg.sender === selectedUser.userId ? "chat-start" : "chat-end"}`}>
+          key={msg._id}
+          className={`my-2 mx-3 chat ${msg.sender === selectedUser.userId ? "chat-start" : "chat-end"}`}>
             <div className="chat-image avatar">
               <div className="size-10 rounded-full">
                 <img
                   src={selectedUser.profilePic || "/avatar.png"}
                   alt="User Avatar"
                   className="rounded-full"
-                />
+                  />
               </div>
             </div>
 
@@ -44,6 +46,7 @@ if (!selectedUser) return null;
         ))
       }
       <MessageInput />
+    {/* </div> */}
     </div>
   )
 }

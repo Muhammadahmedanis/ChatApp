@@ -80,6 +80,19 @@ export const me = createAsyncThunk("auth/me", async (_, { rejectWithValue }) => 
 });
 
 
+
+export const searchUserName = createAsyncThunk("auth/search", async (query, { rejectWithValue}) => {
+    try {
+        const response = await axiosInstance.get(`auth/search?query=${query}`);
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message);
+    }
+})
+
+
+
+
 // Auth Slice
 const authSlice = createSlice({
     name: "Auth",
@@ -88,6 +101,12 @@ const authSlice = createSlice({
         isLoading: false,
         error: null,
         userProfile: null,
+        searchResults: [],
+    },
+    reducers: {
+        clearSearchResult: (state) => {
+            state.searchResults = [];
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -138,7 +157,19 @@ const authSlice = createSlice({
             .addCase(me.rejected, (state, action) => {
                 state.error = action.payload;
             })
+            // .addCase(searchUser.pending, (state) => {
+            //     state.isLoading = true;
+            // })
+            .addCase(searchUserName.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.searchResults = action.payload?.data || [];  // 👈 Store results
+            })
+            .addCase(searchUserName.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
+            })
     }
 });
 
+export const { clearSearchResult } = authSlice.actions;
 export default authSlice.reducer;

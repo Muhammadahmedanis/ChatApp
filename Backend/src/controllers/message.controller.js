@@ -65,7 +65,7 @@ export const getMessages = asyncHandler(async (req, res) => {
         participants: { $all: [ userId, otherUserId ] }
     })
     if(!conversation){
-        throw new ApiError(StatusCodes.BAD_REQUEST, NO_DATA_FOUND)
+        return res.status(StatusCodes.OK).send(new ApiResponse(StatusCodes.OK, '', []));
     };
 
     const message = await Message.find({
