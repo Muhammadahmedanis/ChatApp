@@ -5,12 +5,14 @@ import { LuImage, LuSend } from "react-icons/lu";
 import { useDispatch, useSelector } from 'react-redux';
 import { IoMdClose } from "react-icons/io";
 import { sendMsg } from '../redux/slices/messageSlice';
+import { BiLoaderCircle } from "react-icons/bi";
 
 function MessageInput() {
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
+  const [imageFile, setImageFile] = useState(null);
   const dispatch = useDispatch();
-  const { selectedUser } = useSelector(state => state?.message)
+  const { isLoading, selectedUser } = useSelector(state => state?.message)
   // console.log(selectedUser);  
   
   const handleImageChange = (e) => {
@@ -19,6 +21,7 @@ function MessageInput() {
         toast.error("Please select an image file!")
         return;
     }
+    setImageFile(file);
     const reader = new FileReader();
     reader.onloadend = () => {
       setImagePreview(reader.result);
@@ -28,20 +31,22 @@ function MessageInput() {
 
   const removeImage = () => {
     setImagePreview(null);
+    setImageFile(null);
     if(fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const[data, submitAction, isPending] = useActionState(async (previouState, formData) => {
-    const message = formData.get("message");
-    if(!message.trim()) return;
-    const payload = {
-      text: message,
-      recipientId: selectedUser?.userId,
-      // img: imagePreview,
-    }
-    // console.log(payload);
-    dispatch(sendMsg(payload));
-    // removeImage();
+  const message = formData.get("message");
+  if (!message.trim() && !imageFile) return;
+
+  const newFormData = new FormData();
+  newFormData.append("text", message);
+  newFormData.append("recipientId", selectedUser?.userId);
+  if (imageFile) {
+    newFormData.append("img", imageFile); 
+  }
+  await dispatch(sendMsg(newFormData));
+  removeImage();
   })
 
   return (
@@ -96,7 +101,7 @@ function MessageInput() {
           className="btn btn-sm btn-circle"
           // disabled={!text.trim() || !imagePreview}
           >
-          <LuSend size={22} />
+          {isLoading ? <BiLoaderCircle className="size-7 animate-spin" /> : <LuSend size={22} />}
         </button>
       </form>
     </div>

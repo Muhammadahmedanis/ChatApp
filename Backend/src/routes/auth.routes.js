@@ -8,7 +8,7 @@ authRouter.route("/me").get(verifyJwt, myInfo);
 authRouter.route("/signup").post(signup);
 authRouter.route("/signin").post(signin);
 authRouter.route("/logout").post(verifyJwt, logout);
-authRouter.route("/updateProfile").put(verifyJwt, upload.single("img"), updateProfile);
+authRouter.route("/updateProfile").put(verifyJwt, upload.single("profilePic"), updateProfile);
 authRouter.route("/search").get(verifyJwt, search)
 
 

@@ -11,7 +11,10 @@ const messageSchema = new mongoose.Schema({
     text: {
         type: String,
         required: true,
-    }
+    },
+    img: {
+        type: String,
+    },
 }, { timestamps: true})
 
 export const Message = mongoose.model("Message", messageSchema);

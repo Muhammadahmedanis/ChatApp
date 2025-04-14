@@ -184,7 +184,7 @@ export const updateProfile = asyncHandler(async (req, res) => {
     const { userName, email} = req.body;
     const user = req?.user;
     if (!user) {
-        throw new ApiError(StatusCodes.NOT_FOUND, NO_USER);
+        throw new ApiError(StatusCodes.UNAUTHORIZED, UNAUTHORIZED_REQUEST);
     }
 
     let profilePic = user.profilePic;

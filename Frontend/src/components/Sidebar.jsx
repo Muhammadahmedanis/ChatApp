@@ -16,7 +16,7 @@ function Sidebar() {
     const { user, searchResults } = useSelector(state => state?.auth);
     // console.log(searchResults);
     // console.log(conversations);
-
+    
     const handleSearch = (e) => {
       if(e.key == 'Enter'){
         // console.log(searchUser);

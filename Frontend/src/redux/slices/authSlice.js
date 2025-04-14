@@ -6,7 +6,7 @@ export const signupUser = createAsyncThunk("auth/signup", async (userData, { rej
     try {
         const response = await axiosInstance.post("auth/signup", userData);
         toast.success(response?.data?.message);
-        sessionStorage.setItem("user", JSON.stringify({ userName: response.data.data.userName, id: response.data.data._id }));
+        sessionStorage.setItem("user", JSON.stringify({ userName: response.data.data.userName }));
         return response.data;
     } catch (error) {
         toast.error(error.response?.data?.message);
@@ -20,7 +20,7 @@ export const signinUser = createAsyncThunk("auth/signin", async (userData, { rej
     try {
         const response = await axiosInstance.post(`auth/signin`, userData);
         toast.success(response.data?.message);
-        sessionStorage.setItem("user", JSON.stringify({ userName: response.data.data.userName, id:  response.data.data._id }));
+        sessionStorage.setItem("user", JSON.stringify({ userName: response.data.data.userName }));
         return response.data;
     } catch (error) {
         toast.error(error.response?.data?.message);
@@ -48,7 +48,7 @@ export const logoutUser = createAsyncThunk("auth/logout", async (_, { rejectWith
 
 export const updateUserProfile = createAsyncThunk("auth/updateProfile", async (userData, { rejectWithValue }) => {
     try {
-        const response = await axiosInstance.put(`user/updateProfile`, userData, {
+        const response = await axiosInstance.put(`auth/updateProfile`, userData, {
             headers: {
                 "Content-Type": "multipart/form-data"
             }

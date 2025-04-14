@@ -5,13 +5,11 @@ import toast from "react-hot-toast";
 
 export const sendMsg = createAsyncThunk("msg/send", async (formData, { rejectWithValue }) => {
     try {
-        const response = await axiosInstance.post("msg/send", formData
-        // , {
-        //     headers:{
-        //         'Content-Type': 'multipart/form-data',
-        //     },
-        // }
-    );
+        const response = await axiosInstance.post("msg/send", formData, {
+            headers:{
+                'Content-Type': 'multipart/form-data',
+            },
+        });
         return response.data;
     } catch (error) {
         toast.error(error.response?.data?.message);
@@ -45,6 +43,31 @@ export const otherConversation = createAsyncThunk( "msg/otherUserId", async (oth
     }
 });
   
+
+
+
+export const deleteConversation = createAsyncThunk("msg/deleteMessage/id", async (id, { rejectWithValue }) => {
+    try {
+        await axiosInstance.delete(`msg/deleteMessage/${id}`);
+        return id;
+    } catch (error) {
+        toast.error(error.response?.data?.message || "Failed to delete conversation");
+        return rejectWithValue(error.response?.data?.message);
+    }
+})
+
+
+
+export const editConversation = createAsyncThunk("msg/editMessage/id", async ({ id , text}, { rejectWithValue }) => {
+    try {
+        const response = await axiosInstance.put(`msg/editMessage/${id}`, { text });
+        return response?.data?.data;
+    } catch (error) {
+        toast.error(error.response?.data?.message || "Failed to update conversation");
+        return rejectWithValue(error.response?.data?.message);
+    }
+})
+
 
 
 // Message slice
@@ -114,7 +137,17 @@ const messageSlice = createSlice({
             .addCase(otherConversation.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
-            });
+            })
+            .addCase(deleteConversation.fulfilled, (state, action) => {
+                state.selectedConversation = state.selectedConversation.filter(msg => msg._id !== action.payload);
+            })
+            .addCase(editConversation.fulfilled, (state, action) => {
+                const index = state.selectedConversation.findIndex(msg => msg._id === action.payload._id);
+                console.log(index);
+                if (index !== -1) {
+                  state.selectedConversation[index] = action.payload;
+                }
+            })
     }
 });
 

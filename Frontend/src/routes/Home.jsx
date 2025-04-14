@@ -5,7 +5,6 @@ import ChatContainer from '../components/ChatContainer'
 import { useSelector } from 'react-redux';
 
 function Home() {
-  // selected user from globalState
   const { selectedUser } = useSelector(state => state?.message);
   return (
     <div className='h-screen bg-base-200'>
