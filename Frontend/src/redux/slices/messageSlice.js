@@ -91,6 +91,19 @@ const messageSlice = createSlice({
         setSelectedUser: (state, action) => {
             state.selectedUser = action.payload;
         },
+        pushNewMessage: (state, action) => {
+            const msg = action.payload;
+            const isRelevant =
+              state.selectedUser?._id === msg.sender ||
+              state.selectedUser?._id === msg.receiver;
+          
+            if (isRelevant) {
+              // Only push if not already present
+              if (!state.selectedConversation.some(m => m._id === msg._id)) {
+                state.selectedConversation.push(msg);
+              }
+            }
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -153,5 +166,5 @@ const messageSlice = createSlice({
 
 
 // Export actions & reducer
-export const { clearSelectedConversation, clearMessageStatus, setSelectedUser } = messageSlice.actions;
+export const { clearSelectedConversation, clearMessageStatus, setSelectedUser, pushNewMessage } = messageSlice.actions;
 export default messageSlice.reducer;

@@ -1,26 +1,52 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
-// import './App.css'
-import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
-import Home from './routes/Home';
-import Signup from './routes/Signup';
-import Login from './routes/Login';
-import Setting from './routes/Setting';
-import Profile from './routes/Profile';
-import Layout from './loyout/Loyout';
-import { Toaster } from 'react-hot-toast';
+import React from 'react'
+import { useSelector } from 'react-redux'
+import {
+  Route,
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
+  Navigate,
+  Outlet
+} from 'react-router-dom'
+
+import Home from './routes/Home'
+import Signup from './routes/Signup'
+import Login from './routes/Login'
+import Setting from './routes/Setting'
+import Profile from './routes/Profile'
+import Layout from './loyout/Loyout'
+import { Toaster } from 'react-hot-toast'
+
+const AuthRoute = () => {
+  const { userProfile } = useSelector((state) => state.auth);
+  console.log("AuthRoute check:", userProfile);
+  return !userProfile ? <Outlet /> : <Navigate to="/" />;
+};
+
+const PrivateRoute = () => {
+  const { userProfile } = useSelector((state) => state.auth);
+  console.log("AuthRoute check:", userProfile);
+  return userProfile ? <Outlet /> : <Navigate to="/login" />;
+};
+
 
 function App() {
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <Route path='/' element={ <Layout /> }>
-        <Route index element={<Home /> } />
-        <Route path='/signup' element={ <Signup /> } />
-        <Route path='/login' element={ <Login /> } />
-        <Route path='/settings' element={ <Setting /> } />
-        <Route path='/profile' element={ <Profile /> } />
-      </Route>
+      <>
+        <Route element={<AuthRoute />}>
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+        </Route>
+
+        <Route path="/" element={<Layout />}>
+          <Route element={<PrivateRoute />}>
+            <Route index element={  <Home /> } />
+            <Route path="settings" element={<Setting />} />
+            <Route path="profile" element={<Profile />} />
+          </Route>
+        </Route>
+      </>
     )
   )
 

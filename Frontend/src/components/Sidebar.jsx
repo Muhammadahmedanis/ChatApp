@@ -1,32 +1,32 @@
 import React, { useEffect, useState } from 'react'
 import SidebarSkelton from './SidebarSkelton';
-import { LuUser } from "react-icons/lu";
 import { IoCheckmarkDoneOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from 'react-redux';
 import { getConversation, setSelectedUser } from '../redux/slices/messageSlice';
 import { GoDotFill } from "react-icons/go";
 import { CiSearch } from "react-icons/ci";
 import { searchUserName } from '../redux/slices/authSlice';
+import { useSocket } from '../socketClient/socketContext';
 
 function Sidebar() {
-    const onlineUsers = [];
     const dispatch = useDispatch();
     const[searchUser, setSearchUser] = useState('');
     const { conversations, isLoading, selectedUser } = useSelector(state => state?.message);
     const { user, searchResults } = useSelector(state => state?.auth);
-    // console.log(searchResults);
-    // console.log(conversations);
+    const { onlineUsers } = useSocket() || {};
+    
     
     const handleSearch = (e) => {
       if(e.key == 'Enter'){
-        // console.log(searchUser);
         dispatch(searchUserName(searchUser));
       }
     }
     
-    user && useEffect(() => {
-      dispatch(getConversation());
-    }, [])
+    useEffect(() => {
+      if (user) {
+        dispatch(getConversation());
+      }
+    }, [user, dispatch]);
 
     if (isLoading) return <SidebarSkelton />
 
@@ -43,7 +43,6 @@ function Sidebar() {
   {
     searchResults?.length > 0 ? (
       searchResults.map((convo) => {
-        // console.log(convo);
         // const participant = convo?.participants?.[0];
         return (
           <button
@@ -73,7 +72,6 @@ function Sidebar() {
             <div className="hidden lg:block text-left min-w-0">
               <div className="font-medium truncate">{convo?.userName}</div>
               <div className="text-sm text-zinc-400 flex">
-                {/* You could show online status or last message here */}
                 {convo?.lastMessage?.sender == user?.id  ? <IoCheckmarkDoneOutline size={20} />  : ''}
                 {convo?.lastMessage?.text?.length > 15 ? convo?.lastMessage?.text?.substring(0, 15) + '...' : convo?.lastMessage?.text}
                   </div>
@@ -83,7 +81,6 @@ function Sidebar() {
           })
         ) : conversations?.length > 0 ? (
           conversations.map((convo) => {
-            // console.log(convo);
             const participant = convo?.participants?.[0];
             return (
               <button
@@ -102,18 +99,11 @@ function Sidebar() {
                     alt={participant?.userName || "User"}
                     className="size-12 object-cover rounded-full"
                   />
-                  {onlineUsers.includes(participant?._id) ? <GoDotFill className='absolute top-7 text-green-600 right-0' size={22} /> : ""}
-                  {onlineUsers.includes(participant?._id) && (
-                    <span
-                      className="absolute bottom-0 right-0 size-3 bg-green-500 
-                      rounded-full ring-2 ring-zinc-900"
-                    />
-                  )}
+                  {onlineUsers?.includes(participant?._id) ? <GoDotFill className='absolute top-7 text-green-600 -right-1 border-none' size={26} /> : ""}
                 </div>
                 <div className="hidden lg:block text-left min-w-0">
                   <div className="font-medium truncate">{participant?.userName}</div>
                   <div className="text-sm text-zinc-400 flex">
-                    {/* You could show online status or last message here */}
                     {convo?.lastMessage?.sender == user?.id  ? <IoCheckmarkDoneOutline size={20} />  : ''}
                     {convo?.lastMessage?.text?.length > 15 ? convo?.lastMessage?.text?.substring(0, 15) + '...' : convo?.lastMessage?.text}
                       </div>

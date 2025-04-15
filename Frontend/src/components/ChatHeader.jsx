@@ -3,14 +3,18 @@ import { IoClose } from "react-icons/io5";
 import { useDispatch } from 'react-redux';
 import { setSelectedUser } from '../redux/slices/messageSlice';
 import { clearSearchResult } from '../redux/slices/authSlice';
+import { useSocket } from '../socketClient/socketContext';
 
 function ChatHeader({ data }) {
   const dispatch = useDispatch();
+
+  const { onlineUsers } = useSocket() || {};
 
   const handleClose = () => {
     dispatch(setSelectedUser([]));
     dispatch(clearSearchResult());
   };
+
 
   return (
     <div className="p-2.5 border-b border-base-300">
@@ -24,9 +28,9 @@ function ChatHeader({ data }) {
 
           <div>
             <h3 className="font-medium">{data?.userName}</h3>
-            {/* <p className="text-sm text-base-content/70">
-              {onlineUsers?.includes(selectedUser?._id) ? "Online" : "Offline"}
-            </p> */}
+            <p className="text-sm text-base-content/70">
+              {onlineUsers?.includes(data?._id) ? "Online" : "Offline"}
+            </p>
           </div>
         </div>
 

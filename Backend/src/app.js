@@ -6,8 +6,8 @@ import cookieParser from "cookie-parser";
 import mongoSanitize from "express-mongo-sanitize";
 import authRouter from "./routes/auth.routes.js";
 import messageRouter from "./routes/message.routes.js";
+import { app } from "./socket/socket.js";
 
-const app = express();
 // Middleware Configurations
 app.use(cors({
   origin: [process.env.ALLOWED_ORIGIN_1, process.env.ALLOWED_ORIGIN_2],

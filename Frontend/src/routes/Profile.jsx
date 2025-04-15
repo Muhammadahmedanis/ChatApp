@@ -17,9 +17,9 @@ function Profile() {
   const [email, setEmail] = useState('');
   const [selectedImgFile, setSelectedImgFile] = useState(null);
 
-  useEffect(() => {
-    dispatch(me());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(me());
+  // }, [dispatch]);
 
   useEffect(() => {
     setUserName(userProfile?.data?.userName || '');

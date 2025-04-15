@@ -38,7 +38,7 @@ function Navbar() {
               <span className="hidden sm:inline">Settings</span>
             </Link>
 
-            {JSON.parse(sessionStorage.getItem('user')) ? (
+            {JSON.parse(sessionStorage.getItem('user')) && 
               <>
                 <Link to={"/profile"} className={`btn btn-sm gap-2`}>
                   <LuUser className="size-5" />
@@ -49,14 +49,8 @@ function Navbar() {
                   <LuLogOut className="size-5" />
                   <span className="hidden sm:inline">Logout</span>
                 </button>
-              </>) :
-              <Link to='/login'>
-                <button className="gap-2 btn btn-sm">
-                  <SiGnuprivacyguard className="size-5" />
-                  <span className="hidden sm:inline">Signin</span>
-                </button>
-              </Link>
-          }
+              </>
+            }
           </div>
         </div>
       </div>

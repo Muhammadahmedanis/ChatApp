@@ -8,7 +8,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import AuthImagePattern from '../components/AuthImagePattern';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
-import { signinUser } from '../redux/slices/authSlice';
+import { me, signinUser } from '../redux/slices/authSlice';
 
 function Login() {
   const[showPassword, setShowPassword] = useState();
@@ -40,7 +40,8 @@ function Login() {
     if(payload.email.length && payload.password.length){
       const resultAction = await dispatch(signinUser(payload));
       if(signinUser?.fulfilled?.match(resultAction)){
-        navigate('/');
+        await dispatch(me());
+        // navigate('/');
       }
     }
   })

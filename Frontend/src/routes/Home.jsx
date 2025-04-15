@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 
 function Home() {
   const { selectedUser } = useSelector(state => state?.message);
+
   return (
     <div className='h-screen bg-base-200'>
       <div className='flex items-center justify-center pt-20 px-4'>

@@ -3,9 +3,10 @@ import ChatHeader from './ChatHeader'
 import MessageInput from './MessageInput'
 import MessageSkelton from './MessageSkelton'
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteConversation, editConversation, otherConversation } from '../redux/slices/messageSlice';
+import { deleteConversation, editConversation, otherConversation, pushNewMessage } from '../redux/slices/messageSlice';
 import { FiEdit3 } from 'react-icons/fi';
 import { MdOutlineDeleteOutline } from "react-icons/md";
+import { useSocket } from '../socketClient/socketContext';
 
 function ChatContainer() {
  const { selectedUser, selectedConversation } = useSelector(state => state?.message);
@@ -13,13 +14,31 @@ function ChatContainer() {
 
  const[editingId, setEditingId] = useState(null);
  const[editText, setEditText] = useState("");
-  
+ 
+ const { socket } = useSocket();
+
  useEffect(() => {
+  if (!selectedUser?._id) return;
+
   if (selectedUser?._id) {
     dispatch(otherConversation(selectedUser?._id));
   }
+  
 }, [dispatch, selectedUser?._id]);
-// console.log(selectedConversation);
+
+
+useEffect(() => {
+  if (!socket || !selectedUser?._id) return;
+
+  const handleNewMessage = (msg) => {
+    dispatch(pushNewMessage(msg));
+  };
+
+  socket.on("newMsg", handleNewMessage);
+
+  return () => socket.off("newMsg", handleNewMessage);
+}, [socket, selectedUser?._id, dispatch]);
+
 
 const handleEdit = (msg) => {
   setEditingId(msg._id);
@@ -38,7 +57,7 @@ const handleDelete = async (msgId) => {
   dispatch(deleteConversation(msgId));
 };
 
-console.log(selectedConversation);
+// console.log(selectedConversation);
 
 if (!selectedUser) return null;
   
@@ -51,52 +70,51 @@ if (!selectedUser) return null;
         selectedConversation.map((msg) => {
           const isOwnMessage = msg.sender !== selectedUser._id; // own messages
           return (
-<div
-  key={msg._id}
-  className={`my-4 px-4 flex ${isOwnMessage ? "justify-end" : "justify-start"}`}
->
-  <div className="flex items-end gap-2 max-w-md group relative">
+        <div
+          key={msg._id}
+          className={`my-4 px-4 flex ${isOwnMessage ? "justify-end" : "justify-start"}`}>
+          <div className="flex items-end gap-2 max-w-md group relative">
 
-    {/* Avatar (only for incoming messages) */}
-    {!isOwnMessage && (
-      <div className="chat-image avatar self-end">
-        <div className="w-10 h-10 rounded-full overflow-hidden">
-          <img
-            src={selectedUser.profilePic || "/avatar.png"}
-            alt="User Avatar"
-            className="object-cover w-full h-full"
-          />
-        </div>
-      </div>
-    )}
+            {/* Avatar (only for incoming messages) */}
+            {!isOwnMessage && (
+              <div className="chat-image avatar self-end">
+                <div className="w-10 h-10 rounded-full overflow-hidden">
+                  <img
+                    src={selectedUser.profilePic || "/avatar.png"}
+                    alt="User Avatar"
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+              </div>
+            )}
 
-    {/* Message Content Container */}
-    <div className="chat-bubble max-w-xs p-3 relative">
-      {editingId === msg._id ? (
-        <div>
-          <input
-            type="text"
-            value={editText}
-            onChange={(e) => setEditText(e.target.value)}
-            className="input input-sm w-full mb-2"
-          />
-          <div className="flex justify-end gap-2">
-            <button
-              onClick={() => handleEditSave(msg._id)}
-              className="btn btn-xs btn-success"
-            >
-              Save
-            </button>
-            <button
-              onClick={() => setEditingId(null)}
-              className="btn btn-xs btn-outline"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      ) : (
-        <>
+        {/* Message Content Container */}
+        <div className="chat-bubble max-w-xs p-3 relative">
+          {editingId === msg._id ? (
+            <div>
+              <input
+                type="text"
+                value={editText}
+                onChange={(e) => setEditText(e.target.value)}
+                className="input input-sm w-full mb-2"
+              />
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => handleEditSave(msg._id)}
+                  className="btn btn-xs btn-success"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => setEditingId(null)}
+                  className="btn btn-xs btn-outline"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
           <p className="break-words">{msg.text}</p>
           {msg?.img && (
             <img

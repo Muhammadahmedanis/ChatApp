@@ -13,7 +13,6 @@ function MessageInput() {
   const [imageFile, setImageFile] = useState(null);
   const dispatch = useDispatch();
   const { isLoading, selectedUser } = useSelector(state => state?.message)
-  // console.log(selectedUser);  
   
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -45,7 +44,7 @@ function MessageInput() {
   if (imageFile) {
     newFormData.append("img", imageFile); 
   }
-  await dispatch(sendMsg(newFormData));
+  dispatch(sendMsg(newFormData));
   removeImage();
   })
 
@@ -77,7 +76,6 @@ function MessageInput() {
             type="text"
             className="w-full input input-bordered rounded-lg input-sm sm:input-md"
             placeholder="Type a message..."
-            // value={text}
             name='message'
           />
           <input
@@ -99,7 +97,6 @@ function MessageInput() {
         <button
           type="submit"
           className="btn btn-sm btn-circle"
-          // disabled={!text.trim() || !imagePreview}
           >
           {isLoading ? <BiLoaderCircle className="size-7 animate-spin" /> : <LuSend size={22} />}
         </button>

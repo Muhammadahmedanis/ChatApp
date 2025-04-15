@@ -22,6 +22,7 @@ export const signinUser = createAsyncThunk("auth/signin", async (userData, { rej
         toast.success(response.data?.message);
         sessionStorage.setItem("user", JSON.stringify({ userName: response.data.data.userName }));
         return response.data;
+        return user;
     } catch (error) {
         toast.error(error.response?.data?.message);
         return rejectWithValue(error.response?.data?.message);
@@ -71,7 +72,6 @@ export const updateUserProfile = createAsyncThunk("auth/updateProfile", async (u
 export const me = createAsyncThunk("auth/me", async (_, { rejectWithValue }) => {
     try {
         const response = await axiosInstance.get("auth/me");
-        // toast.success(response.data?.message);
         return response.data;
     } catch (error) {
         toast.error(error.response?.data?.message || "Failed to fetch user");
@@ -97,7 +97,7 @@ export const searchUserName = createAsyncThunk("auth/search", async (query, { re
 const authSlice = createSlice({
     name: "Auth",
     initialState: {
-        user: sessionStorage.getItem("user") ? JSON.parse(sessionStorage.getItem("user")) : null,
+        user: null,
         isLoading: false,
         error: null,
         userProfile: null,
@@ -135,6 +135,7 @@ const authSlice = createSlice({
             })
             .addCase(logoutUser.fulfilled, (state) => {
                 state.user = null;
+                state.userProfile = null;
             })
             .addCase(updateUserProfile.pending, (state) => {
                 state.isLoading = true;
@@ -153,6 +154,7 @@ const authSlice = createSlice({
             })
             .addCase(me.fulfilled, (state, action) => {
                 state.userProfile = action.payload;
+                state.user = action.payload;
             })
             .addCase(me.rejected, (state, action) => {
                 state.error = action.payload;

@@ -7,6 +7,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { responseMessages } from "../constant/responseMessages.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import {v2 as cloudinary} from "cloudinary"
+import { getRecipientSocketId, io } from "../socket/socket.js";
 const { MISSING_FIELDS, USER_EXISTS, UN_AUTHORIZED, SUCCESS_REGISTRATION, DELETED_SUCCESS_MESSAGES, NO_USER, SUCCESS_LOGIN, INVALID_OTP, OTP_EXPIRED, EMAIL_VERIFY, SUCCESS_LOGOUT, MISSING_FIELD_EMAIL_PASSWORD, UNAUTHORIZED_REQUEST, GET_SUCCESS_MESSAGES, RESET_LINK_SUCCESS, PASSWORD_CHANGE, NOT_VERIFY, PASSWORD_AND_CONFIRM_NO_MATCH, UPDATE_UNSUCCESS_MESSAGES, MISSING_FIELD_EMAIL, RESET_OTP_SECCESS, INVALID_TOKEN, TOKEN_EXPIRED, SUCCESS_TOKEN, INVALID_DATA, NO_DATA_FOUND, IMAGE_SUCCESS, IMAGE_ERROR , UPDATE_SUCCESS_MESSAGES, UNAUTHORIZED, NOT_ALLOWED, EMPTY_URL_PARAMS} = responseMessages
 
 export const sendMsg = asyncHandler(async (req, res) => {
@@ -55,6 +56,9 @@ export const sendMsg = asyncHandler(async (req, res) => {
             }
         })
     ])
+
+    // const recipientSocketId = getRecipientSocketId(recipientId);
+    // recipientSocketId && io.to(recipientSocketId).emit("newMsg", newMsg); 
     return res.status(StatusCodes.OK).send(new ApiResponse(StatusCodes.OK, '', newMsg));
 })
 
